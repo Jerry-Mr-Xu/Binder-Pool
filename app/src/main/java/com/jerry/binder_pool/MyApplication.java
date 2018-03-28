@@ -15,12 +15,7 @@ public class MyApplication extends Application {
     public void onCreate() {
         super.onCreate();
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                // 初始化与BinderPool的连接
-                BinderPoolConnectUtils.getInstance(MyApplication.this);
-            }
-        }).start();
+        // 初始化与BinderPool的连接
+        BinderPoolConnectUtils.getInstance(MyApplication.this);
     }
 }

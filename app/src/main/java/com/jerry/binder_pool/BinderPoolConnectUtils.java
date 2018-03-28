@@ -10,9 +10,6 @@ import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-
-import java.util.concurrent.CountDownLatch;
-
 /**
  * Binder连接池服务的连接工具类
  * <p>
@@ -48,25 +45,12 @@ public class BinderPoolConnectUtils {
         connectBinderPoolService();
     }
 
-    private CountDownLatch latch = null;
-
     private synchronized void connectBinderPoolService() {
         Log.i(TAG, "Start connect to BinderPoolService...");
-        // 使用这个CountDownLatch是为了将bindService这个异步过程转为同步过程
-        // CountDownLatch任务数 = 1
-        latch = new CountDownLatch(1);
 
         Intent serviceIntent = new Intent("com.jerry.binder_pool.service");
         serviceIntent.setPackage("com.jerry.binder_pool");
         applicationContext.bindService(serviceIntent, connection, Context.BIND_AUTO_CREATE);
-
-        try {
-            // 会暂停线程，直到CountDownLatch任务数 = 0
-            latch.await();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        Log.i(TAG, "Connect to BinderPoolService success!");
     }
 
     private IBinderPool binderPool = null;
@@ -83,8 +67,7 @@ public class BinderPoolConnectUtils {
                 e.printStackTrace();
             }
 
-            // 将CountDownLatch任务数 - 1
-            latch.countDown();
+            Log.i(TAG, "Connect to BinderPoolService success!");
         }
 
         @Override
