@@ -10,7 +10,6 @@ import android.widget.Button;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -30,6 +29,37 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         initView();
         initListener();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                doWork();
+            }
+        }).start();
+    }
+
+    private void doWork() {
+        BinderPoolConnectUtils connectUtils = BinderPoolConnectUtils.getInstance(MainActivity.this);
+        IBinder binder = connectUtils.queryBinder(BinderPoolConnectUtils.BINDER_CODE_SECURITY);
+        ISecurity security = ISecurity.Stub.asInterface(binder);
+        try {
+            Log.i(TAG, "Encrypt  \"Binder连接池加密测试\"");
+            String encryptedData = security.encrypt("Binder连接池加密测试");
+            Log.i(TAG, "After encrypt \"" + encryptedData + "\"");
+            Log.i(TAG, "Decrypt \"" + encryptedData + "\"");
+            String originData = security.decrypt(encryptedData);
+            Log.i(TAG, "After decrypt \"" + originData + "\"");
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+
+        binder = connectUtils.queryBinder(BinderPoolConnectUtils.BINDER_CODE_COMPUTE);
+        ICompute compute = ICompute.Stub.asInterface(binder);
+        try {
+            Log.i(TAG, "Add 1 + 2 = " + compute.add(1, 2));
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
     }
 
     private void initListener() {

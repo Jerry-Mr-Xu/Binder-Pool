@@ -16,6 +16,11 @@ public class MyApplication extends Application {
         super.onCreate();
 
         // 初始化与BinderPool的连接
-        BinderPoolConnectUtils.getInstance(MyApplication.this);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                BinderPoolConnectUtils.getInstance(MyApplication.this);
+            }
+        }).start();
     }
 }
